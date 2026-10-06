@@ -1090,7 +1090,7 @@ def advanced_image(kind):
 
         'similar': os.path.join(
             BASE_DIR,
-            'patient_172_top_similar_cases.png'
+            'similar_patients.png'  
         )
     }
 
