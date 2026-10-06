@@ -1,25 +1,4 @@
-# ============================================================
-# STATIC RESEARCH RESULT IMAGES
-# ============================================================
-
-@app.route('/research-image/<filename>')
-def research_image(filename):
-
-    allowed_images = {
-        'patient_172_xai_validation.png',
-        'patient_172_modality_contribution.png',
-        'training_validation_accuracy.png',
-        'final_test_confusion_matrix.png',
-        'boundary_aware_uncertainty.png',
-        'ordinal_error_analysis.png'
-    }
-
-    if filename not in allowed_images:
-        return jsonify({'error': 'Invalid image'}), 404
-
-    path = os.path.join(BASE_DIR, filename)
-
-    if not os.path.exists(path):
+   if not os.path.exists(path):
         return jsonify({'error': 'Image not found'}), 404
 
     return send_file(path, mimetype='image/png')
