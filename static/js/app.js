@@ -167,9 +167,9 @@ async function analyzePatient() {
         document.getElementById(
             "burdenValue"
         ).textContent =
-            data.tumor_burden_percent !== undefined
+            data.tumor_burden !== undefined
             ?
-            `${data.tumor_burden_percent}%`
+            `${data.tumor_burden}%`
             :
             "N/A";
 
@@ -177,17 +177,17 @@ async function analyzePatient() {
         document.getElementById(
             "reliabilityValue"
         ).textContent =
-            data.reliability_status ||
+           data.reliability ||
             "N/A";
 
 
         document.getElementById(
             "uncertaintyValue"
         ).textContent =
-            data.uncertainty_score !== undefined
+            data.uncertainty !== undefined
             ?
             Number(
-                data.uncertainty_score
+                data.uncertainty
             ).toFixed(4)
             :
             "N/A";
