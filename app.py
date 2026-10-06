@@ -902,37 +902,56 @@ def demo_patients():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
-@app.route("/api/demo/analyze/172")
-def demo_analyze_172():
+@app.route("/api/demo/analyze/<int:patient_id>")
+def demo_analyze_patient(patient_id):
+    try:
+        df = pd.read_csv(PREDICTION_CSV)
 
-    return jsonify({
-        "patient_id": 172,
+        row = df[df["patient_id"] == patient_id]
 
-        "true_class": "High",
-        "predicted_class": "High",
+        if row.empty:
+            return jsonify({"error": "Patient not found"}), 404
 
-        "confidence": 85.84,
+        row = row.iloc[0]
+        confidence = float(row["confidence_percent"])
 
-        "probabilities": {
-            "Low": 5.22,
-            "Moderate": 8.94,
-            "High": 85.84
-        },
+        result = {
+            "patient_id": int(row["patient_id"]),
+            "true_class": str(row["true_class"]),
+            "predicted_class": str(row["predicted_class"]),
+            "confidence": round(confidence, 2),
 
-        "tumor_burden": 1.6746,
+            "probabilities": {
+                "Low": round(float(row["prob_low"]) * 100, 2),
+                "Moderate": round(float(row["prob_moderate"]) * 100, 2),
+                "High": round(float(row["prob_high"]) * 100, 2)
+            },
 
-        "uncertainty": 0.1155,
+            "tumor_burden": round(
+                float(row["tumor_burden_percent"]), 4
+            ),
 
-        "reliability": "High Reliability",
+            "uncertainty": round(100 - confidence, 2),
 
-        "mri": {
-            "t1n": "/static/mri/patient_172/t1n.png",
-            "t1c": "/static/mri/patient_172/t1c.png",
-            "t2w": "/static/mri/patient_172/t2w.png",
-            "t2f": "/static/mri/patient_172/t2f.png"
+            "reliability": (
+                "High Reliability" if confidence >= 70
+                else "Moderate Reliability" if confidence >= 50
+                else "Low Reliability"
+            )
         }
-    })
 
+        if patient_id == 172:
+            result["mri"] = {
+                "t1n": "/static/mri/patient_172/t1n.png",
+                "t1c": "/static/mri/patient_172/t1c.png",
+                "t2w": "/static/mri/patient_172/t2w.png",
+                "t2f": "/static/mri/patient_172/t2f.png"
+            }
+
+        return jsonify(result)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/demo/mri/172/<modality>")
 def demo_mri_172(modality):
