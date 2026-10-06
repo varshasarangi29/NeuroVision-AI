@@ -886,13 +886,21 @@ def health():
 
 @app.route("/api/demo/patients")
 def demo_patients():
-    return jsonify([
-        {"patient_id": 172, "true_class": "High", "predicted_class": "High"},
-        {"patient_id": 101, "true_class": "Low", "predicted_class": "Low"},
-        {"patient_id": 125, "true_class": "Moderate", "predicted_class": "Moderate"},
-        {"patient_id": 150, "true_class": "High", "predicted_class": "High"}
-    ])
+    try:
+        df = pd.read_csv(PREDICTION_CSV)
 
+        patients = []
+        for _, row in df.iterrows():
+            patients.append({
+                "patient_id": int(row["patient_id"]),
+                "true_class": str(row["true_class"]),
+                "predicted_class": str(row["predicted_class"])
+            })
+
+        return jsonify(patients)
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route("/api/demo/analyze/172")
 def demo_analyze_172():
