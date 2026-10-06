@@ -33,8 +33,11 @@ UNCERTAINTY_CSV = os.path.join(
     "boundary_uncertainty_results.csv"
 )
 
-PREPROCESSED_DIR = (
-    "/kaggle/working/preprocessed_3d"
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+PREPROCESSED_DIR = os.path.join(
+    BASE_DIR,
+    "preprocessed_3d"
 )
 
 
@@ -876,9 +879,85 @@ def health():
 # ============================================================
 
 
-# MRI Upload API
-from upload_api import register_upload_api
-register_upload_api(app, model, device)
+
+# ============================================================
+# PERMANENT PATIENT 172 WEB DEMO
+# ============================================================
+
+@app.route("/api/demo/patients")
+def demo_patients():
+    return jsonify([
+        {
+            "patient_id": 172,
+            "true_class": "High",
+            "predicted_class": "High"
+        }
+    ])
+
+
+@app.route("/api/demo/analyze/172")
+def demo_analyze_172():
+
+    return jsonify({
+        "patient_id": 172,
+
+        "true_class": "High",
+        "predicted_class": "High",
+
+        "confidence": 85.84,
+
+        "probabilities": {
+            "Low": 5.22,
+            "Moderate": 8.94,
+            "High": 85.84
+        },
+
+        "tumor_burden": 1.6746,
+
+        "uncertainty": 0.1155,
+
+        "reliability": "High Reliability",
+
+        "mri": {
+            "t1n": "/static/mri/patient_172/t1n.png",
+            "t1c": "/static/mri/patient_172/t1c.png",
+            "t2w": "/static/mri/patient_172/t2w.png",
+            "t2f": "/static/mri/patient_172/t2f.png"
+        }
+    })
+
+
+@app.route("/api/demo/mri/172/<modality>")
+def demo_mri_172(modality):
+
+    allowed = ["t1n", "t1c", "t2w", "t2f"]
+
+    modality = modality.lower()
+
+    if modality not in allowed:
+        return jsonify({
+            "error": "Invalid modality"
+        }), 400
+
+    path = os.path.join(
+        BASE_DIR,
+        "static",
+        "mri",
+        "patient_172",
+        f"{modality}.png"
+    )
+
+    if not os.path.exists(path):
+        return jsonify({
+            "error": "MRI image not found"
+        }), 404
+
+    return send_file(
+        path,
+        mimetype="image/png"
+    )
+
+
 
 if __name__ == "__main__":
 
@@ -893,8 +972,7 @@ if __name__ == "__main__":
 # ============================================================
 from flask import send_file
 
-PROJECT_ROOT = os.path.dirname(BASE_DIR)
-ADVANCED_RESULTS_DIR = os.path.join(PROJECT_ROOT, "final_project_results")
+ADVANCED_RESULTS_DIR = "/kaggle/working/final_project_results"
 
 def _read_first_csv(path):
     if not os.path.exists(path):
