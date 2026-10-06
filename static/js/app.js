@@ -11,7 +11,7 @@ async function loadPatients() {
     try {
 
         const response =
-            await fetch("/api/patients");
+         await fetch("/api/demo/patients");
 
         const patients =
             await response.json();
