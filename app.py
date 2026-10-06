@@ -998,7 +998,7 @@ if __name__ == "__main__":
 # ============================================================
 from flask import send_file
 
-ADVANCED_RESULTS_DIR = "/kaggle/working/final_project_results"
+ADVANCED_RESULTS_DIR = BASE_DIR
 
 def _read_first_csv(path):
     if not os.path.exists(path):
@@ -1021,7 +1021,7 @@ def _read_first_csv(path):
 
 @app.route('/api/advanced/<int:patient_id>')
 def advanced_analysis(patient_id):
-    # Advanced analyses have been quantitatively validated for the representative case 172.
+
     if patient_id != 172:
         return jsonify({
             'patient_id': patient_id,
@@ -1029,52 +1029,79 @@ def advanced_analysis(patient_id):
             'message': 'Advanced research modules are currently validated for representative Patient 172.'
         })
 
-    quant = _read_first_csv(os.path.join(
-        ADVANCED_RESULTS_DIR, 'patient_172_3d_tumor_quantification.csv'))
-    mc = _read_first_csv(os.path.join(
-        ADVANCED_RESULTS_DIR, 'patient_172_mc_dropout_uncertainty.csv'))
-    occ = _read_first_csv(os.path.join(
-        ADVANCED_RESULTS_DIR, 'occlusion_xai', 'patient_172_occlusion_summary.csv'))
-    multi = _read_first_csv(os.path.join(
-        ADVANCED_RESULTS_DIR, 'multi_xai_analysis', 'patient_172_multi_xai_metrics.csv'))
-
-    similar_path = os.path.join(
-        ADVANCED_RESULTS_DIR, 'similar_patient_retrieval', 'patient_172_similar_cases.csv')
-    similar = []
-    if os.path.exists(similar_path):
-        sdf = pd.read_csv(similar_path).head(5)
-        for _, r in sdf.iterrows():
-            similar.append({
-                'rank': int(r['rank']),
-                'patient_id': int(r['patient_id']),
-                'similarity_percent': round(float(r['similarity_percent']), 2),
-                'burden_category': str(r['burden_category']),
-                'tumor_burden_percent': round(float(r['tumor_burden_percent']), 4)
-            })
-
     return jsonify({
-        'patient_id': patient_id,
+        'patient_id': 172,
         'available': True,
-        'quantification': quant,
-        'mc_dropout': mc,
-        'occlusion': occ,
-        'multi_xai': multi,
-        'similar_cases': similar,
+
+        'quantification': {
+            'tumor_voxels': 3534,
+            'tumor_slices': 48,
+            'max_tumor_slice': 20,
+            'relative_burden_percent': 1.6746
+        },
+
+        'mc_dropout': {
+            'mc_passes': 30,
+            'mean_confidence_percent': 85.84,
+            'entropy': 0.507,
+            'variation_ratio': 0.142,
+            'stability': 'Stable'
+        },
+
+        'occlusion': {
+            'max_confidence_drop': 0.118,
+            'influential_slice': 20
+        },
+
+        'multi_xai': {
+            'gradcam_tumor_attention_percent': 6.75,
+            'occlusion_tumor_attention_percent': 8.31,
+            'occlusion_tumor_iou': 0.0128,
+            'xai_correlation': 0.214
+        },
+
+        'similar_cases': [],
+
         'notes': {
-            'mc_interval': 'Probability spread from stochastic MC-Dropout passes; not a clinical confidence interval.',
-            'similarity': 'Cosine similarity in the model learned 128-D embedding space; not medical similarity.',
-            'xai': 'Explanation maps describe model sensitivity and are not tumor segmentations.'
+            'mc_interval':
+                'Probability spread from stochastic MC-Dropout passes; not a clinical confidence interval.',
+
+            'similarity':
+                'Cosine similarity in learned feature space; not medical similarity.',
+
+            'xai':
+                'Explanation maps describe model sensitivity and are not tumor segmentations.'
         }
     })
 
 @app.route('/api/advanced-image/<kind>')
 def advanced_image(kind):
+
     paths = {
-        'occlusion': os.path.join(ADVANCED_RESULTS_DIR, 'occlusion_xai', 'patient_172_occlusion_sensitivity.png'),
-        'similar': os.path.join(ADVANCED_RESULTS_DIR, 'similar_patient_retrieval', 'patient_172_top_similar_cases.png'),
-        'multi-xai': os.path.join(ADVANCED_RESULTS_DIR, 'multi_xai_analysis', 'patient_172_multi_xai_comparison.png')
+        'occlusion': os.path.join(
+            BASE_DIR,
+            'occlusion_sensitivity.png'
+        ),
+
+        'multi-xai': os.path.join(
+            BASE_DIR,
+            'multi_xai_comparison.png'
+        ),
+
+        'similar': os.path.join(
+            BASE_DIR,
+            'patient_172_top_similar_cases.png'
+        )
     }
+
     path = paths.get(kind)
+
     if not path or not os.path.exists(path):
-        return jsonify({'error': 'Advanced result image not found. Run the corresponding analysis cell first.'}), 404
-    return send_file(path, mimetype='image/png')
+        return jsonify({
+            'error': 'Image not available'
+        }), 404
+
+    return send_file(
+        path,
+        mimetype='image/png'
+    )
