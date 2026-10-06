@@ -1,0 +1,33 @@
+{
+    "architecture": "Compact ResNet-18-style 3D",
+    "input_modalities": [
+        "T1N",
+        "T1C",
+        "T2W",
+        "T2F"
+    ],
+    "input_shape": [
+        4,
+        64,
+        64,
+        64
+    ],
+    "classes": [
+        "Low",
+        "Moderate",
+        "High"
+    ],
+    "num_classes": 3,
+    "total_patients": 257,
+    "train_patients": 179,
+    "validation_patients": 39,
+    "test_patients": 39,
+    "random_seed": 42,
+    "optimizer": "AdamW",
+    "initial_learning_rate": 0.001,
+    "weight_decay": 0.0001,
+    "batch_size": 2,
+    "best_epoch": 7,
+    "best_validation_loss": 0.8899255899282602,
+    "best_validation_accuracy": 0.6153846153846154
+}
