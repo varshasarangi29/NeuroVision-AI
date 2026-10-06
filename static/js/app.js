@@ -336,26 +336,65 @@ async function loadAdvancedAnalysis(patientId) {
         }
         notice.textContent = "Advanced research modules loaded for representative Patient 172.";
         notice.classList.remove("show");
+const q = data.quantification || {};
+const mc = data.mc_dropout || {};
+const oc = data.occlusion || {};
+const mx = data.multi_xai || {};
 
-        const q=data.quantification||{}, mc=data.mc_dropout||{}, oc=data.occlusion||{}, mx=data.multi_xai||{};
-        document.getElementById("advTumorVoxels").textContent = q.tumor_voxels ? Number(q.tumor_voxels).toLocaleString() : "—";
-        document.getElementById("advTumorSlices").textContent = q.tumor_containing_slices ?? "—";
-        document.getElementById("advMaxSlice").textContent = q.max_tumor_slice ?? "—";
-        document.getElementById("advBurden").textContent = q.relative_tumor_burden_percent !== undefined ? `${fmt(q.relative_tumor_burden_percent,4)}%` : "—";
+document.getElementById("advTumorVoxels").textContent =
+    q.tumor_voxels !== undefined ? Number(q.tumor_voxels).toLocaleString() : "—";
 
-        document.getElementById("advMCPasses").textContent = mc.mc_passes ?? "—";
-        document.getElementById("advMCMean").textContent = mc.predicted_confidence_mean !== undefined ? `${fmt(mc.predicted_confidence_mean*100,2)}%` : "—";
-        document.getElementById("advEntropy").textContent = fmt(mc.normalized_entropy,4);
-        document.getElementById("advVariation").textContent = fmt(mc.variation_ratio,4);
-        document.getElementById("advStability").textContent = mc.stability || "—";
+document.getElementById("advTumorSlices").textContent =
+    q.tumor_slices ?? "—";
 
-        document.getElementById("advOccDrop").textContent = oc.maximum_confidence_drop !== undefined ? `${fmt(oc.maximum_confidence_drop*100,2)} pp` : "—";
-        document.getElementById("advOccSlice").textContent = oc.most_influential_slice ?? "—";
-        document.getElementById("advGradAtt").textContent = mx.gradcam_attention_inside_tumor !== undefined ? `${fmt(mx.gradcam_attention_inside_tumor*100,2)}%` : "—";
-        document.getElementById("advOccAtt").textContent = mx.occlusion_attention_inside_tumor !== undefined ? `${fmt(mx.occlusion_attention_inside_tumor*100,2)}%` : "—";
-        document.getElementById("advOccIou").textContent = fmt(mx.occlusion_tumor_iou,4);
-        document.getElementById("advCorr").textContent = fmt(mx.gradcam_occlusion_correlation,4);
+document.getElementById("advMaxSlice").textContent =
+    q.max_tumor_slice ?? "—";
 
+document.getElementById("advBurden").textContent =
+    q.relative_burden_percent !== undefined
+        ? `${fmt(q.relative_burden_percent, 4)}%`
+        : "—";
+
+document.getElementById("advMCPasses").textContent =
+    mc.mc_passes ?? "—";
+
+document.getElementById("advMCMean").textContent =
+    mc.mean_confidence_percent !== undefined
+        ? `${fmt(mc.mean_confidence_percent, 2)}%`
+        : "—";
+
+document.getElementById("advEntropy").textContent =
+    fmt(mc.entropy, 3);
+
+document.getElementById("advVariation").textContent =
+    fmt(mc.variation_ratio, 4);
+
+document.getElementById("advStability").textContent =
+    mc.stability || "—";
+
+document.getElementById("advOccDrop").textContent =
+    oc.max_confidence_drop !== undefined
+        ? `${fmt(oc.max_confidence_drop * 100, 2)} pp`
+        : "—";
+
+document.getElementById("advOccSlice").textContent =
+    oc.influential_slice ?? "—";
+
+document.getElementById("advGradAtt").textContent =
+    mx.gradcam_tumor_attention_percent !== undefined
+        ? `${fmt(mx.gradcam_tumor_attention_percent, 2)}%`
+        : "—";
+
+document.getElementById("advOccAtt").textContent =
+    mx.occlusion_tumor_attention_percent !== undefined
+        ? `${fmt(mx.occlusion_tumor_attention_percent, 2)}%`
+        : "—";
+
+document.getElementById("advOccIou").textContent =
+    fmt(mx.occlusion_tumor_iou, 4);
+
+document.getElementById("advCorr").textContent =
+    fmt(mx.xai_correlation, 3);
         const holder=document.getElementById("similarCases"); holder.innerHTML="";
         (data.similar_cases||[]).forEach(c=>{
             const el=document.createElement("div"); el.className="similar-case";
