@@ -1,0 +1,2 @@
+patient_id,mc_passes,mc_prediction,low_mean_probability,moderate_mean_probability,high_mean_probability,predicted_confidence_mean,predicted_confidence_std,confidence_interval_lower,confidence_interval_upper,predictive_entropy,normalized_entropy,variation_ratio,stability
+172,30,High,0.062278584,0.10727013,0.83045125,0.830451250076294,0.07634136080741882,0.6808221828937531,0.9800803172588348,0.56665057,0.5157875760937526,0.0,Moderate Predictive Stability

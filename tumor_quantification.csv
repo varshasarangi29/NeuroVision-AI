@@ -1,0 +1,2 @@
+patient_id,valid_slices,tumor_voxels,brain_voxels,relative_tumor_burden_percent,tumor_containing_slices,max_tumor_slice,max_slice_tumor_voxels,tumor_extent_z,tumor_extent_y,tumor_extent_x,region_2_voxels
+172,155,92329,5513395,1.6746,54,64,2746,54,64,77,92329

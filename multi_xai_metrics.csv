@@ -1,0 +1,2 @@
+patient_id,gradcam_attention_inside_tumor,occlusion_attention_inside_tumor,gradcam_tumor_iou,occlusion_tumor_iou,gradcam_occlusion_iou,gradcam_occlusion_correlation,gradcam_pointing_game,occlusion_pointing_game,gradcam_max_z,gradcam_max_y,gradcam_max_x,occlusion_max_z,occlusion_max_y,occlusion_max_x
+172,0.002890091622248292,0.04142114520072937,0.0,0.05094453929613923,0.0,-0.11822131570625265,MISS,MISS,0,24,24,32,16,32
