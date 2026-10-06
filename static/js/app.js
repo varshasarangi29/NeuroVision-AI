@@ -377,3 +377,29 @@ analyzeButton.addEventListener("click", () => {
 
 patientSelect.addEventListener("change", () => loadAdvancedAnalysis(patientSelect.value));
 setTimeout(() => loadAdvancedAnalysis(patientSelect.value || 172), 1200);
+// ===== FINAL DEMO IMAGE FIX =====
+window.addEventListener("load", () => {
+    const staticImages = {
+        mriT1N: "/static/t1n.png",
+        mriT1C: "/static/t1c.png",
+        mriT2W: "/static/t2w.png",
+        mriT2F: "/static/t2f.png"
+    };
+
+    Object.entries(staticImages).forEach(([id, src]) => {
+        const img = document.getElementById(id);
+        if (img) {
+            img.src = src;
+            img.style.display = "block";
+        }
+    });
+
+    // Hide any broken optional research images instead of showing broken icons
+    document.querySelectorAll("img").forEach(img => {
+        img.addEventListener("error", function () {
+            if (!["mriT1N","mriT1C","mriT2W","mriT2F"].includes(this.id)) {
+                this.style.display = "none";
+            }
+        });
+    });
+});
