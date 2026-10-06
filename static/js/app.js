@@ -86,7 +86,7 @@ async function analyzePatient() {
 
         const response =
             await fetch(
-                `/api/analyze/${patientId}`
+                `/api/demo/analyze/${patientId}`
             );
 
 
