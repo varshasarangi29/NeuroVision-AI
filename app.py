@@ -887,11 +887,10 @@ def health():
 @app.route("/api/demo/patients")
 def demo_patients():
     return jsonify([
-        {
-            "patient_id": 172,
-            "true_class": "High",
-            "predicted_class": "High"
-        }
+        {"patient_id": 172, "true_class": "High", "predicted_class": "High"},
+        {"patient_id": 101, "true_class": "Low", "predicted_class": "Low"},
+        {"patient_id": 125, "true_class": "Moderate", "predicted_class": "Moderate"},
+        {"patient_id": 150, "true_class": "High", "predicted_class": "High"}
     ])
 
 
