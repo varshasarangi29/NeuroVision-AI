@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Pediatric Brain AI</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+
+<body>
+
+<!-- ===================================================== -->
+<!-- SIDEBAR -->
+<!-- ===================================================== -->
+
+<aside class="sidebar">
+
+    <div class="brand">
+
+        <div class="brand-icon">✦</div>
+
+        <div>
+            <h2>NeuroVision AI</h2>
+            <span>Pediatric MRI Intelligence</span>
+        </div>
+
+    </div>
+
+    <nav>
+
+        <a href="#dashboard" class="nav-item active">
+            <span>◈</span>
+            Dashboard
+        </a>
+
+        <a href="#analysis" class="nav-item">
+            <span>⌁</span>
+            Patient Analysis
+        </a>
+
+        <a href="#advanced" class="nav-item"><span>✧</span>Advanced AI</a>
+
+        <a href="#explainability" class="nav-item">
+            <span>◎</span>
+            Explainable AI
+        </a>
+
+        <a href="#performance" class="nav-item">
+            <span>▥</span>
+            Model Performance
+        </a>
+
+        <a href="#methodology" class="nav-item">
+            <span>⌘</span>
+            Methodology
+        </a>
+
+    </nav>
+
+    <div class="sidebar-bottom">
+
+        <div class="model-status">
+
+            <div class="status-dot"></div>
+
+            <div>
+                <strong>3D ResNet</strong>
+                <small>Model Ready</small>
+            </div>
+
+        </div>
+
+        <p>
+            Research & Educational Prototype
+        </p>
+
+    </div>
+
+</aside>
+
+
+<!-- ===================================================== -->
+<!-- MAIN -->
+<!-- ===================================================== -->
+
+<main class="main">
+
+<!-- ===================================================== -->
+<!-- HEADER -->
+<!-- ===================================================== -->
+
+<header class="topbar">
+
+    <div>
+        <p class="eyebrow">
+            DEEP LEARNING • 3D MRI • EXPLAINABLE AI
+        </p>
+
+        <h1>
+            Pediatric Brain Tumor
+            <span>Burden Analysis</span>
+        </h1>
+
+        <p class="subtitle">
+            AI-assisted analysis of multi-modal pediatric brain MRI
+            using a compact 3D ResNet architecture.
+        </p>
+    </div>
+
+    <div class="research-badge">
+        <span>●</span>
+        Research Prototype
+    </div>
+
+</header>
+
+
+<!-- ===================================================== -->
+<!-- DASHBOARD METRICS -->
+<!-- ===================================================== -->
+
+<section id="dashboard" class="metrics-grid">
+
+    <div class="metric-card">
+        <span class="metric-label">MRI Modalities</span>
+        <strong>4</strong>
+        <p>T1N • T1C • T2W • T2F</p>
+    </div>
+
+    <div class="metric-card">
+        <span class="metric-label">Labeled Patients</span>
+        <strong>257</strong>
+        <p>Patient-wise development cohort</p>
+    </div>
+
+    <div class="metric-card">
+        <span class="metric-label">3D Input</span>
+        <strong>64³</strong>
+        <p>Four-channel MRI volume</p>
+    </div>
+
+    <div class="metric-card">
+        <span class="metric-label">Test Accuracy</span>
+        <strong>41.03%</strong>
+        <p>Unseen 39-patient test set</p>
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- PATIENT ANALYSIS -->
+<!-- ===================================================== -->
+
+<section id="analysis" class="section">
+
+    <div class="section-heading">
+
+        <div>
+            <span class="section-number">01</span>
+            <h2>Patient Analysis</h2>
+            <p>
+                Run the trained 3D ResNet on a real preprocessed
+                pediatric MRI volume.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="analysis-layout">
+
+        <!-- LEFT -->
+
+        <div class="panel patient-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <span class="mini-label">
+                        SAMPLE CASE
+                    </span>
+
+                    <h3>Real Dataset Patient</h3>
+                </div>
+
+                <span class="live-tag">
+                    LIVE MODEL
+                </span>
+
+            </div>
+
+
+            <label class="input-label">
+                Select Test Patient
+            </label>
+
+            <select id="patientSelect">
+
+                <option value="172">
+                    Patient 172 — Demonstration Case
+                </option>
+
+            </select>
+
+
+            <div class="mri-viewer">
+
+                <div class="viewer-top">
+                    <div>
+                        <span class="mini-label">
+                            PREPROCESSED 3D MRI
+                        </span>
+                        <h3>Multi-Modal Slice Viewer</h3>
+                    </div>
+
+                    <span id="sliceCounter"
+                          class="slice-counter">
+                        Slice 33 / 64
+                    </span>
+                </div>
+
+                <div class="mri-grid">
+
+                    <div class="mri-image-card">
+                        <span>T1N</span>
+                        <img id="mriT1N" alt="T1N MRI">
+                    </div>
+
+                    <div class="mri-image-card">
+                        <span>T1C</span>
+                        <img id="mriT1C" alt="T1C MRI">
+                    </div>
+
+                    <div class="mri-image-card">
+                        <span>T2W</span>
+                        <img id="mriT2W" alt="T2W MRI">
+                    </div>
+
+                    <div class="mri-image-card">
+                        <span>T2F</span>
+                        <img id="mriT2F" alt="T2F MRI">
+                    </div>
+
+                </div>
+
+                <div class="slice-control">
+                    <span>1</span>
+
+                    <input
+                        type="range"
+                        id="sliceSlider"
+                        min="0"
+                        max="63"
+                        value="32">
+
+                    <span>64</span>
+                </div>
+
+                <p class="viewer-note">
+                    Showing the preprocessed 64-slice volume
+                    supplied to the trained 3D ResNet.
+                </p>
+
+            </div>
+
+
+            <button id="analyzeBtn"
+                    class="primary-button">
+
+                <span>✦</span>
+                Analyze with 3D ResNet
+
+            </button>
+
+            <p class="input-note">
+                Prediction is generated by the actual trained model,
+                not a hard-coded result.
+            </p>
+
+        </div>
+
+
+        <!-- RIGHT -->
+
+        <div class="panel result-panel">
+
+            <div class="panel-header">
+
+                <div>
+                    <span class="mini-label">
+                        AI OUTPUT
+                    </span>
+
+                    <h3>Analysis Result</h3>
+                </div>
+
+                <span id="resultStatus"
+                      class="waiting-tag">
+                    READY
+                </span>
+
+            </div>
+
+
+            <div class="prediction-main">
+
+                <span>
+                    Predicted Burden Category
+                </span>
+
+                <h2 id="predictionText">
+                    —
+                </h2>
+
+                <p>
+                    Model confidence
+                </p>
+
+                <strong id="confidenceText">
+                    —
+                </strong>
+
+            </div>
+
+
+            <div class="probability-area">
+
+                <!-- LOW -->
+
+                <div class="probability-row">
+
+                    <div class="probability-title">
+                        <span>Low</span>
+                        <span id="lowValue">0%</span>
+                    </div>
+
+                    <div class="progress">
+                        <div id="lowBar"
+                             class="progress-fill">
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- MODERATE -->
+
+                <div class="probability-row">
+
+                    <div class="probability-title">
+                        <span>Moderate</span>
+                        <span id="moderateValue">0%</span>
+                    </div>
+
+                    <div class="progress">
+                        <div id="moderateBar"
+                             class="progress-fill">
+                        </div>
+                    </div>
+
+                </div>
+
+
+                <!-- HIGH -->
+
+                <div class="probability-row">
+
+                    <div class="probability-title">
+                        <span>High</span>
+                        <span id="highValue">0%</span>
+                    </div>
+
+                    <div class="progress">
+                        <div id="highBar"
+                             class="progress-fill">
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="research-values">
+
+                <div>
+                    <span>Tumor Burden</span>
+                    <strong id="burdenValue">—</strong>
+                </div>
+
+                <div>
+                    <span>Reliability</span>
+                    <strong id="reliabilityValue">—</strong>
+                </div>
+
+                <div>
+                    <span>Uncertainty</span>
+                    <strong id="uncertaintyValue">—</strong>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- ADVANCED AI ANALYSIS -->
+<!-- ===================================================== -->
+<section id="advanced" class="section">
+  <div class="section-heading"><div><span class="section-number">02</span><h2>Advanced AI Analysis</h2><p>High-level research modules validated on representative Patient 172.</p></div></div>
+
+  <div id="advancedNotice" class="advanced-notice">Select Patient 172 and run the model to load advanced analysis.</div>
+
+  <div class="advanced-grid">
+    <div class="panel advanced-card">
+      <span class="mini-label">3D TUMOR QUANTIFICATION</span><h3>Volumetric Tumor Profile</h3>
+      <div class="advanced-stats">
+        <div><span>Tumor Voxels</span><strong id="advTumorVoxels">—</strong></div>
+        <div><span>Tumor Slices</span><strong id="advTumorSlices">—</strong></div>
+        <div><span>Max Tumor Slice</span><strong id="advMaxSlice">—</strong></div>
+        <div><span>Relative Burden</span><strong id="advBurden">—</strong></div>
+      </div>
+      <p class="scientific-note">Voxel-based research quantification; no physical cm³ is claimed without reliable voxel-spacing metadata.</p>
+    </div>
+
+    <div class="panel advanced-card">
+      <span class="mini-label">MC-DROPOUT UNCERTAINTY</span><h3>Predictive Stability</h3>
+      <div class="advanced-stats">
+        <div><span>MC Passes</span><strong id="advMCPasses">—</strong></div>
+        <div><span>Mean Confidence</span><strong id="advMCMean">—</strong></div>
+        <div><span>Entropy</span><strong id="advEntropy">—</strong></div>
+        <div><span>Variation Ratio</span><strong id="advVariation">—</strong></div>
+      </div>
+      <div class="highlight-box"><span>Stability</span><strong id="advStability">—</strong><p id="advMCNote">30 stochastic forward passes test prediction stability.</p></div>
+    </div>
+  </div>
+
+  <div class="advanced-grid advanced-visual-grid">
+    <div class="panel image-card"><span class="mini-label">3D OCCLUSION XAI</span><h3>Spatial Sensitivity</h3><img src="/api/advanced-image/occlusion" alt="3D occlusion sensitivity"><div class="advanced-stats"><div><span>Max Confidence Drop</span><strong id="advOccDrop">—</strong></div><div><span>Influential Slice</span><strong id="advOccSlice">—</strong></div></div></div>
+    <div class="panel image-card"><span class="mini-label">MULTI-XAI VALIDATION</span><h3>Grad-CAM vs Occlusion vs Tumor</h3><img src="/api/advanced-image/multi-xai" alt="Multi XAI comparison"><div class="advanced-stats"><div><span>Grad-CAM Tumor Attention</span><strong id="advGradAtt">—</strong></div><div><span>Occlusion Tumor Attention</span><strong id="advOccAtt">—</strong></div><div><span>Occlusion ↔ Tumor IoU</span><strong id="advOccIou">—</strong></div><div><span>XAI Correlation</span><strong id="advCorr">—</strong></div></div></div>
+  </div>
+
+  <div class="panel similar-panel">
+    <div class="panel-header"><div><span class="mini-label">DEEP 3D EMBEDDING RETRIEVAL</span><h3>AI Similar Reference Cases</h3></div><span class="live-tag">128-D FEATURES</span></div>
+    <img class="similar-chart" src="/api/advanced-image/similar" alt="Top similar reference cases">
+    <div id="similarCases" class="similar-cases"></div>
+    <p class="scientific-note">Similarity is cosine similarity in the model's learned feature space, not a measure of clinical or biological similarity.</p>
+  </div>
+</section>
+
+<!-- ===================================================== -->
+<!-- XAI -->
+<!-- ===================================================== -->
+
+<section id="explainability"
+         class="section">
+
+    <div class="section-heading">
+
+        <div>
+            <span class="section-number">03</span>
+
+            <h2>Explainable AI</h2>
+
+            <p>
+                Model interpretation using 3D Grad-CAM and
+                patient-specific modality analysis.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="xai-grid">
+
+        <div class="panel image-card">
+
+            <div class="panel-header">
+                <div>
+                    <span class="mini-label">
+                        3D GRAD-CAM
+                    </span>
+                    <h3>Attention Validation</h3>
+                </div>
+            </div>
+
+            <img
+                src="{{ url_for('static',
+                filename='results/patient_172_xai_validation.png') }}"
+                alt="Grad-CAM validation">
+
+            <div class="xai-stats">
+
+                <div>
+                    <span>Attention in Tumor</span>
+                    <strong>0.29%</strong>
+                </div>
+
+                <div>
+                    <span>IoU</span>
+                    <strong>0.0000</strong>
+                </div>
+
+                <div>
+                    <span>Pointing Game</span>
+                    <strong>MISS</strong>
+                </div>
+
+            </div>
+
+            <p class="scientific-note">
+                High classification confidence does not necessarily
+                imply anatomically faithful localization.
+            </p>
+
+        </div>
+
+
+        <div class="panel image-card">
+
+            <div class="panel-header">
+
+                <div>
+                    <span class="mini-label">
+                        MODALITY ABLATION
+                    </span>
+
+                    <h3>Sequence Contribution</h3>
+                </div>
+
+            </div>
+
+            <img
+                src="{{ url_for('static',
+                filename='results/patient_172_modality_contribution.png') }}"
+                alt="Modality contribution">
+
+            <div class="highlight-box">
+
+                <span>
+                    Most influential for Patient 172
+                </span>
+
+                <strong>
+                    T2W
+                </strong>
+
+                <p>
+                    Removing T2W reduced predicted-class
+                    probability by 4.39 percentage points.
+                </p>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- PERFORMANCE -->
+<!-- ===================================================== -->
+
+<section id="performance"
+         class="section">
+
+    <div class="section-heading">
+
+        <div>
+            <span class="section-number">04</span>
+
+            <h2>Model Performance</h2>
+
+            <p>
+                Genuine held-out results without post-test tuning.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="performance-summary">
+
+        <div>
+            <span>Validation Accuracy</span>
+            <strong>61.54%</strong>
+        </div>
+
+        <div>
+            <span>Test Accuracy</span>
+            <strong>41.03%</strong>
+        </div>
+
+        <div>
+            <span>Macro F1</span>
+            <strong>0.4071</strong>
+        </div>
+
+        <div>
+            <span>Within-One-Class</span>
+            <strong>94.87%</strong>
+        </div>
+
+    </div>
+
+
+    <div class="performance-grid">
+
+        <div class="panel graph-card">
+
+            <h3>Training & Validation Accuracy</h3>
+
+            <img
+                src="{{ url_for('static',
+                filename='results/training_validation_accuracy.png') }}"
+                alt="Training validation accuracy">
+
+        </div>
+
+
+        <div class="panel graph-card">
+
+            <h3>Final Test Confusion Matrix</h3>
+
+            <img
+                src="{{ url_for('static',
+                filename='results/final_test_confusion_matrix.png') }}"
+                alt="Confusion matrix">
+
+        </div>
+
+
+        <div class="panel graph-card">
+
+            <h3>Boundary-Aware Uncertainty</h3>
+
+            <img
+                src="{{ url_for('static',
+                filename='results/boundary_aware_uncertainty.png') }}"
+                alt="Boundary uncertainty">
+
+        </div>
+
+
+        <div class="panel graph-card">
+
+            <h3>Ordinal Error Analysis</h3>
+
+            <img
+                src="{{ url_for('static',
+                filename='results/ordinal_error_analysis.png') }}"
+                alt="Ordinal error analysis">
+
+        </div>
+
+    </div>
+
+
+    <div class="ordinal-note">
+
+        <strong>Ordinal Interpretation</strong>
+
+        <p>
+            Exact test accuracy is 41.03%. The 94.87%
+            within-one-class value is an ordinal tolerance metric,
+            not classification accuracy. Only 2 of 39 test cases
+            produced severe Low ↔ High errors.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- METHODOLOGY -->
+<!-- ===================================================== -->
+
+<section id="methodology"
+         class="section">
+
+    <div class="section-heading">
+
+        <div>
+            <span class="section-number">05</span>
+            <h2>Methodology</h2>
+
+            <p>
+                End-to-end research pipeline.
+            </p>
+        </div>
+
+    </div>
+
+
+    <div class="pipeline">
+
+        <div class="pipeline-card">
+            <span>01</span>
+            <strong>BraTS-PED</strong>
+            <p>Pediatric multi-modal MRI</p>
+        </div>
+
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-card">
+            <span>02</span>
+            <strong>Preprocessing</strong>
+            <p>Normalization + 64³ resizing</p>
+        </div>
+
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-card">
+            <span>03</span>
+            <strong>3D ResNet</strong>
+            <p>Four-channel volumetric learning</p>
+        </div>
+
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-card">
+            <span>04</span>
+            <strong>Burden Class</strong>
+            <p>Low • Moderate • High</p>
+        </div>
+
+        <div class="pipeline-arrow">→</div>
+
+        <div class="pipeline-card">
+            <span>05</span>
+            <strong>Explainability</strong>
+            <p>Grad-CAM + uncertainty + ablation</p>
+        </div>
+
+    </div>
+
+
+    <div class="method-note">
+
+        <h3>What exactly does this system classify?</h3>
+
+        <p>
+            The model classifies
+            <strong>dataset-relative tumor burden</strong>
+            into Low, Moderate, and High categories.
+            Categories were derived from segmentation-based
+            tumor-to-nonzero-brain voxel percentage.
+            They are not histological tumor types, clinical
+            grades, or disease stages.
+        </p>
+
+    </div>
+
+</section>
+
+
+<!-- ===================================================== -->
+<!-- FOOTER -->
+<!-- ===================================================== -->
+
+<footer>
+
+    <div>
+        <strong>NeuroVision AI</strong>
+        <span>3D Pediatric Brain MRI Research System</span>
+    </div>
+
+    <p>
+        Research & Educational Prototype —
+        Not for Clinical Diagnosis
+    </p>
+
+</footer>
+
+</main>
+
+
+<script src="{{ url_for('static',
+filename='js/app.js') }}"></script>
+
+</body>
+</html>
