@@ -436,12 +436,3 @@ window.addEventListener("load", () => {
         }
     });
 
-    // Hide any broken optional research images instead of showing broken icons
-    document.querySelectorAll("img").forEach(img => {
-        img.addEventListener("error", function () {
-            if (!["mriT1N","mriT1C","mriT2W","mriT2F"].includes(this.id)) {
-                this.style.display = "none";
-            }
-        });
-    });
-});
