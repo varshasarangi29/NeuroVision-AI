@@ -251,90 +251,20 @@ let sliderTimer = null;
 
 async function loadMRISlice() {
 
-    const patientId =
-        patientSelect.value;
+    const patientId = patientSelect.value;
 
-    const slice =
-        Number(sliceSlider.value);
+    if (!patientId) return;
 
-    if (!patientId)
-        return;
+    // Representative BraTS-PED MRI images
+    document.getElementById("mriT1N").src = "/static/t1n.png";
+    document.getElementById("mriT1C").src = "/static/t1c.png";
+    document.getElementById("mriT2W").src = "/static/t2w.png";
+    document.getElementById("mriT2F").src = "/static/t2f.png";
 
-    const requestNumber =
-        ++mriRequestNumber;
-
-
-    // Update counter immediately
     document.getElementById(
         "sliceCounter"
-    ).textContent =
-        `Slice ${slice + 1} / 64`;
-
-
-    try {
-
-        const response =
-            await fetch(
-                `/api/mri/${patientId}/${slice}`
-            );
-
-        const data =
-            await response.json();
-
-
-        if (!response.ok) {
-            throw new Error(
-                data.error ||
-                "MRI slice could not be loaded."
-            );
-        }
-
-
-        // If user moved slider quickly,
-        // ignore an older request
-        if (
-            requestNumber !==
-            mriRequestNumber
-        ) {
-            return;
-        }
-
-
-        document.getElementById(
-            "mriT1N"
-        ).src =
-            data.modalities.T1N;
-
-
-        document.getElementById(
-            "mriT1C"
-        ).src =
-            data.modalities.T1C;
-
-
-        document.getElementById(
-            "mriT2W"
-        ).src =
-            data.modalities.T2W;
-
-
-        document.getElementById(
-            "mriT2F"
-        ).src =
-            data.modalities.T2F;
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "MRI Viewer Error:",
-            error
-        );
-
-    }
+    ).textContent = "Representative MRI";
 }
-
 
 // ------------------------------------------------------------
 // SLIDER
