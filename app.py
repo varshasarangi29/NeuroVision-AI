@@ -1021,55 +1021,48 @@ def _read_first_csv(path):
 @app.route('/api/advanced/<int:patient_id>')
 def advanced_analysis(patient_id):
 
-    if patient_id != 172:
+@app.route('/api/advanced/<int:patient_id>')
+def advanced_analysis(patient_id):
+    path = os.path.join(BASE_DIR, "all_39_advanced_ai.json")
+
+    with open(path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    patient = data.get(str(patient_id))
+
+    if patient is None:
         return jsonify({
-            'patient_id': patient_id,
-            'available': False,
-            'message': 'Advanced research modules are currently validated for representative Patient 172.'
-        })
+            "patient_id": patient_id,
+            "available": False,
+            "message": "Patient not found"
+        }), 404
 
     return jsonify({
-        'patient_id': 172,
-        'available': True,
-
-        'quantification': {
-            'tumor_voxels': 3534,
-            'tumor_slices': 48,
-            'max_tumor_slice': 20,
-            'relative_burden_percent': 1.6746
+        "patient_id": patient_id,
+        "available": True,
+        "quantification": {
+            "tumor_voxels": patient["tumor_voxels"],
+            "tumor_slices": patient["tumor_containing_slices"],
+            "max_tumor_slice": patient["max_tumor_slice"],
+            "relative_burden_percent": patient["relative_tumor_burden_percent"]
         },
-
-        'mc_dropout': {
-            'mc_passes': 30,
-            'mean_confidence_percent': 85.84,
-            'entropy': 0.507,
-            'variation_ratio': 0.142,
-            'stability': 'Stable'
+        "mc_dropout": {
+            "mc_passes": patient["mc_passes"],
+            "mean_confidence_percent": patient["predicted_confidence_mean"] * 100,
+            "entropy": patient["predictive_entropy"],
+            "variation_ratio": patient["variation_ratio"],
+            "stability": patient["stability"]
         },
-
-        'occlusion': {
-            'max_confidence_drop': 0.118,
-            'influential_slice': 20
+        "multi_xai": {
+            "gradcam_tumor_attention_percent":
+                patient["gradcam_attention_inside_tumor_percent"],
+            "gradcam_tumor_iou": patient["gradcam_tumor_iou"],
+            "pointing_game": patient["gradcam_pointing_game"]
         },
-
-        'multi_xai': {
-            'gradcam_tumor_attention_percent': 6.75,
-            'occlusion_tumor_attention_percent': 8.31,
-            'occlusion_tumor_iou': 0.0128,
-            'xai_correlation': 0.214
-        },
-
-        'similar_cases': [],
-
-        'notes': {
-            'mc_interval':
-                'Probability spread from stochastic MC-Dropout passes; not a clinical confidence interval.',
-
-            'similarity':
-                'Cosine similarity in learned feature space; not medical similarity.',
-
-            'xai':
-                'Explanation maps describe model sensitivity and are not tumor segmentations.'
+        "occlusion": None,
+        "similar_cases": [],
+        "notes": {
+            "xai": "Research-only model explanation; not a clinical diagnosis."
         }
     })
 
@@ -1129,23 +1122,3 @@ def research_image(filename):
         return jsonify({'error': 'Image not found'}), 404
 
     return send_file(path, mimetype='image/png')
-# Advanced AI results for all 39 patients
-ADVANCED_JSON_PATH = os.path.join(
-    os.path.dirname(os.path.abspath(__file__)),
-    "all_39_advanced_ai.json"
-)
-
-@app.route("/api/advanced/<int:patient_id>")
-def advanced_analysis_all_patients(patient_id):
-    with open(ADVANCED_JSON_PATH, "r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    patient = data.get(str(patient_id))
-
-    if patient is None:
-        return jsonify({"error": "Patient not found"}), 404
-
-    return jsonify({
-        "patient_id": patient_id,
-        **patient
-    })
