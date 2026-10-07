@@ -249,7 +249,9 @@ async function loadAdvancedAnalysis(patientId) {
     const notice =
         document.getElementById("advancedNotice");
 
-    if (!notice) return;
+    if (!notice) {
+    console.warn("Advanced notice element not found");
+}
 
     try {
 
