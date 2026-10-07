@@ -1129,3 +1129,23 @@ def research_image(filename):
         return jsonify({'error': 'Image not found'}), 404
 
     return send_file(path, mimetype='image/png')
+# Advanced AI results for all 39 patients
+ADVANCED_JSON_PATH = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "all_39_advanced_ai.json"
+)
+
+@app.route("/api/advanced/<int:patient_id>")
+def advanced_analysis_all_patients(patient_id):
+    with open(ADVANCED_JSON_PATH, "r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    patient = data.get(str(patient_id))
+
+    if patient is None:
+        return jsonify({"error": "Patient not found"}), 404
+
+    return jsonify({
+        "patient_id": patient_id,
+        **patient
+    })
