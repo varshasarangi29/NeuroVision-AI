@@ -151,34 +151,29 @@ async function analyzePatient() {
 // ============================================================
 
 function loadMRISlice() {
+    const patientId = patientSelect.value;
+    if (!patientId) return;
 
-    const patientId = Number(patientSelect.value || 172);
+    const modalities = {
+        mriT1N: "t1n",
+        mriT1C: "t1c",
+        mriT2W: "t2w",
+        mriT2F: "t2f"
+    };
+
+    Object.entries(modalities).forEach(([elementId, modality]) => {
+        const img = document.getElementById(elementId);
+
+        if (img) {
+            img.src = `/static/patients/${patientId}_${modality}.png`;
+            img.style.display = "block";
+        }
+    });
 
     const counter = document.getElementById("sliceCounter");
 
-    if (patientId === 172) {
-
-        document.getElementById("mriT1N").src = "/static/t1n.png";
-        document.getElementById("mriT1C").src = "/static/t1c.png";
-        document.getElementById("mriT2W").src = "/static/t2w.png";
-        document.getElementById("mriT2F").src = "/static/t2f.png";
-
-        if (counter) {
-            counter.textContent = "Representative Patient 172 MRI";
-        }
-
-    } else {
-
-        // Do not show Patient 172 MRI as another patient's MRI
-        document.getElementById("mriT1N").removeAttribute("src");
-        document.getElementById("mriT1C").removeAttribute("src");
-        document.getElementById("mriT2W").removeAttribute("src");
-        document.getElementById("mriT2F").removeAttribute("src");
-
-        if (counter) {
-            counter.textContent =
-                `MRI volume not deployed for Patient ${patientId}`;
-        }
+    if (counter) {
+        counter.textContent = `Patient ${patientId} — Representative MRI Slice`;
     }
 }
 
