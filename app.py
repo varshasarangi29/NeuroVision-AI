@@ -1018,8 +1018,7 @@ def _read_first_csv(path):
             out[k] = v
     return out
 
-@app.route('/api/advanced/<int:patient_id>')
-def advanced_analysis(patient_id):
+
 
 @app.route('/api/advanced/<int:patient_id>')
 def advanced_analysis(patient_id):
