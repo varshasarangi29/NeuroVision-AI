@@ -1,236 +1,424 @@
-   if not os.path.exists(path):
-        return jsonify({'error': 'Image not found'}), 404
+const analyzeButton = document.getElementById("analyzeBtn");
+const patientSelect = document.getElementById("patientSelect");
+const sliceSlider = document.getElementById("sliceSlider");
 
-    return send_file(path, mimetype='image/png')
-const analyzeButton =
-    document.getElementById("analyzeBtn");
 
-const patientSelect =
-    document.getElementById("patientSelect");
-
+// ============================================================
+// PATIENT LIST
+// ============================================================
 
 async function loadPatients() {
-
     try {
+        const response = await fetch("/api/demo/patients");
+        const patients = await response.json();
 
-        const response =
-         await fetch("/api/demo/patients");
-
-        const patients =
-            await response.json();
-
-        if (!Array.isArray(patients))
-            return;
+        if (!Array.isArray(patients)) return;
 
         patientSelect.innerHTML = "";
 
         patients.forEach(patient => {
+            const option = document.createElement("option");
 
-            const option =
-                document.createElement("option");
-
-            option.value =
-                patient.patient_id;
+            option.value = patient.patient_id;
 
             option.textContent =
-                `Patient ${patient.patient_id} — ` +
-                `Reference: ${patient.true_class}`;
+                `Patient ${patient.patient_id} — Reference: ${patient.true_class}`;
 
             patientSelect.appendChild(option);
-
         });
 
+        // Patient 172 is the validated website demonstration case
+        const has172 = patients.some(p => Number(p.patient_id) === 172);
 
-        // Prefer patient 172 for demonstration
-
-        const has172 =
-            patients.some(
-                p => p.patient_id === 172
-            );
-
-        if (has172)
+        if (has172) {
             patientSelect.value = "172";
+        }
 
+        loadMRISlice();
+        loadAdvancedAnalysis(patientSelect.value);
+
+    } catch (error) {
+        console.error("Could not load patients:", error);
     }
-
-    catch (error) {
-
-        console.error(
-            "Could not load patients:",
-            error
-        );
-
-    }
-
 }
 
 
+// ============================================================
+// PATIENT ANALYSIS
+// ============================================================
+
 async function analyzePatient() {
 
-    const patientId =
-        patientSelect.value;
+    const patientId = patientSelect.value;
 
-    if (!patientId)
-        return;
-
+    if (!patientId) return;
 
     analyzeButton.disabled = true;
+    analyzeButton.innerHTML = "Loading saved model result...";
 
-    analyzeButton.innerHTML =
-        "Analyzing 3D MRI...";
+    const status = document.getElementById("resultStatus");
 
-
-    document.getElementById(
-        "resultStatus"
-    ).textContent = "PROCESSING";
-
+    if (status) status.textContent = "PROCESSING";
 
     try {
 
         const response =
-            await fetch(
-                `/api/demo/analyze/${patientId}`
-            );
+            await fetch(`/api/demo/analyze/${patientId}`);
 
+        const data = await response.json();
+
+        if (!response.ok) {
+            throw new Error(data.error || "Analysis failed");
+        }
+
+
+        // ---------------- PREDICTION ----------------
+
+        document.getElementById("predictionText").textContent =
+            data.predicted_class;
+
+        document.getElementById("confidenceText").textContent =
+            `${Number(data.confidence).toFixed(2)}%`;
+
+
+        // ---------------- PROBABILITIES ----------------
+
+        const low = Number(data.probabilities?.Low || 0);
+        const moderate = Number(data.probabilities?.Moderate || 0);
+        const high = Number(data.probabilities?.High || 0);
+
+        document.getElementById("lowValue").textContent =
+            `${low.toFixed(2)}%`;
+
+        document.getElementById("moderateValue").textContent =
+            `${moderate.toFixed(2)}%`;
+
+        document.getElementById("highValue").textContent =
+            `${high.toFixed(2)}%`;
+
+        document.getElementById("lowBar").style.width =
+            `${low}%`;
+
+        document.getElementById("moderateBar").style.width =
+            `${moderate}%`;
+
+        document.getElementById("highBar").style.width =
+            `${high}%`;
+
+
+        // ---------------- RESEARCH VALUES ----------------
+
+        document.getElementById("burdenValue").textContent =
+            data.tumor_burden !== undefined
+                ? `${Number(data.tumor_burden).toFixed(4)}%`
+                : "N/A";
+
+        document.getElementById("reliabilityValue").textContent =
+            data.reliability || "N/A";
+
+        document.getElementById("uncertaintyValue").textContent =
+            data.uncertainty !== undefined
+                ? `${Number(data.uncertainty).toFixed(2)}%`
+                : "N/A";
+
+
+        if (status) status.textContent = "ANALYSIS COMPLETE";
+
+        // Patient 172 has validated advanced research analysis
+        loadAdvancedAnalysis(patientId);
+
+    } catch (error) {
+
+        console.error(error);
+
+        if (status) status.textContent = "ERROR";
+
+        alert("Analysis failed: " + error.message);
+
+    } finally {
+
+        analyzeButton.disabled = false;
+
+        analyzeButton.innerHTML =
+            "<span>✦</span> Analyze with 3D ResNet";
+    }
+}
+
+
+// ============================================================
+// MRI VIEWER
+// Representative Patient 172 MRI available in deployed build
+// ============================================================
+
+function loadMRISlice() {
+
+    const patientId = Number(patientSelect.value || 172);
+
+    const counter = document.getElementById("sliceCounter");
+
+    if (patientId === 172) {
+
+        document.getElementById("mriT1N").src = "/static/t1n.png";
+        document.getElementById("mriT1C").src = "/static/t1c.png";
+        document.getElementById("mriT2W").src = "/static/t2w.png";
+        document.getElementById("mriT2F").src = "/static/t2f.png";
+
+        if (counter) {
+            counter.textContent = "Representative Patient 172 MRI";
+        }
+
+    } else {
+
+        // Do not show Patient 172 MRI as another patient's MRI
+        document.getElementById("mriT1N").removeAttribute("src");
+        document.getElementById("mriT1C").removeAttribute("src");
+        document.getElementById("mriT2W").removeAttribute("src");
+        document.getElementById("mriT2F").removeAttribute("src");
+
+        if (counter) {
+            counter.textContent =
+                `MRI volume not deployed for Patient ${patientId}`;
+        }
+    }
+}
+
+
+// Slider retained for UI.
+// Deployed representative images are fixed exported slices.
+
+if (sliceSlider) {
+
+    sliceSlider.addEventListener("input", () => {
+
+        const patientId = Number(patientSelect.value || 172);
+
+        const counter = document.getElementById("sliceCounter");
+
+        if (counter && patientId === 172) {
+            counter.textContent =
+                "Representative Patient 172 MRI";
+        }
+    });
+}
+
+
+// ============================================================
+// ADVANCED AI
+// ============================================================
+
+function fmt(v, digits = 2) {
+
+    if (
+        v === null ||
+        v === undefined ||
+        Number.isNaN(Number(v))
+    ) {
+        return "—";
+    }
+
+    return Number(v).toFixed(digits);
+}
+
+
+function clearAdvanced() {
+
+    const ids = [
+        "advTumorVoxels",
+        "advTumorSlices",
+        "advMaxSlice",
+        "advBurden",
+        "advMCPasses",
+        "advMCMean",
+        "advEntropy",
+        "advVariation",
+        "advStability",
+        "advOccDrop",
+        "advOccSlice",
+        "advGradAtt",
+        "advOccAtt",
+        "advOccIou",
+        "advCorr"
+    ];
+
+    ids.forEach(id => {
+
+        const el = document.getElementById(id);
+
+        if (el) el.textContent = "—";
+    });
+}
+
+
+async function loadAdvancedAnalysis(patientId) {
+
+    const notice =
+        document.getElementById("advancedNotice");
+
+    if (!notice) return;
+
+    try {
+
+        const response =
+            await fetch(`/api/advanced/${patientId}`);
 
         const data =
             await response.json();
 
-
         if (!response.ok) {
-
             throw new Error(
-                data.error ||
-                "Analysis failed"
+                data.error || "Advanced analysis failed"
             );
-
         }
 
 
-        // Prediction
+        if (!data.available) {
 
-        document.getElementById(
-            "predictionText"
-        ).textContent =
-            data.predicted_class;
+            clearAdvanced();
 
+            notice.textContent =
+                data.message ||
+                "Advanced analysis is available for representative Patient 172.";
 
-        document.getElementById(
-            "confidenceText"
-        ).textContent =
-            `${data.confidence}%`;
+            notice.classList.add("show");
 
-
-        // Probabilities
-
-        const low =
-            data.probabilities.Low;
-
-        const moderate =
-            data.probabilities.Moderate;
-
-        const high =
-            data.probabilities.High;
+            return;
+        }
 
 
-        document.getElementById(
-            "lowValue"
-        ).textContent =
-            `${low}%`;
+        notice.textContent =
+            "Advanced research modules loaded for representative Patient 172.";
 
-        document.getElementById(
-            "moderateValue"
-        ).textContent =
-            `${moderate}%`;
-
-        document.getElementById(
-            "highValue"
-        ).textContent =
-            `${high}%`;
+        notice.classList.remove("show");
 
 
-        document.getElementById(
-            "lowBar"
-        ).style.width =
-            `${low}%`;
-
-        document.getElementById(
-            "moderateBar"
-        ).style.width =
-            `${moderate}%`;
-
-        document.getElementById(
-            "highBar"
-        ).style.width =
-            `${high}%`;
+        const q = data.quantification || {};
+        const mc = data.mc_dropout || {};
+        const oc = data.occlusion || {};
+        const mx = data.multi_xai || {};
 
 
-        // Research values
+        // ---------------- QUANTIFICATION ----------------
 
-        document.getElementById(
-            "burdenValue"
-        ).textContent =
-            data.tumor_burden !== undefined
-            ?
-            `${data.tumor_burden}%`
-            :
-            "N/A";
+        document.getElementById("advTumorVoxels").textContent =
+            q.tumor_voxels !== undefined
+                ? Number(q.tumor_voxels).toLocaleString()
+                : "—";
 
+        document.getElementById("advTumorSlices").textContent =
+            q.tumor_slices ?? "—";
 
-        document.getElementById(
-            "reliabilityValue"
-        ).textContent =
-           data.reliability ||
-            "N/A";
+        document.getElementById("advMaxSlice").textContent =
+            q.max_tumor_slice ?? "—";
 
-
-        document.getElementById(
-            "uncertaintyValue"
-        ).textContent =
-            data.uncertainty !== undefined
-            ?
-            Number(
-                data.uncertainty
-            ).toFixed(4)
-            :
-            "N/A";
+        document.getElementById("advBurden").textContent =
+            q.relative_burden_percent !== undefined
+                ? `${fmt(q.relative_burden_percent, 4)}%`
+                : "—";
 
 
-        document.getElementById(
-            "resultStatus"
-        ).textContent =
-            "ANALYSIS COMPLETE";
+        // ---------------- MC DROPOUT ----------------
 
-    }
+        document.getElementById("advMCPasses").textContent =
+            mc.mc_passes ?? "—";
 
-    catch (error) {
+        document.getElementById("advMCMean").textContent =
+            mc.mean_confidence_percent !== undefined
+                ? `${fmt(mc.mean_confidence_percent, 2)}%`
+                : "—";
 
-        console.error(error);
+        document.getElementById("advEntropy").textContent =
+            fmt(mc.entropy, 3);
 
-        document.getElementById(
-            "resultStatus"
-        ).textContent =
-            "ERROR";
+        document.getElementById("advVariation").textContent =
+            fmt(mc.variation_ratio, 4);
 
-        alert(
-            "Analysis failed: " +
-            error.message
+        document.getElementById("advStability").textContent =
+            mc.stability || "—";
+
+
+        // ---------------- OCCLUSION ----------------
+
+        document.getElementById("advOccDrop").textContent =
+            oc.max_confidence_drop !== undefined
+                ? `${fmt(
+                    Number(oc.max_confidence_drop) * 100,
+                    2
+                )} pp`
+                : "—";
+
+        document.getElementById("advOccSlice").textContent =
+            oc.influential_slice ?? "—";
+
+
+        // ---------------- MULTI-XAI ----------------
+
+        document.getElementById("advGradAtt").textContent =
+            mx.gradcam_tumor_attention_percent !== undefined
+                ? `${fmt(
+                    mx.gradcam_tumor_attention_percent,
+                    2
+                )}%`
+                : "—";
+
+        document.getElementById("advOccAtt").textContent =
+            mx.occlusion_tumor_attention_percent !== undefined
+                ? `${fmt(
+                    mx.occlusion_tumor_attention_percent,
+                    2
+                )}%`
+                : "—";
+
+        document.getElementById("advOccIou").textContent =
+            fmt(mx.occlusion_tumor_iou, 4);
+
+        document.getElementById("advCorr").textContent =
+            fmt(mx.xai_correlation, 3);
+
+
+        // ---------------- SIMILAR CASES ----------------
+
+        const holder =
+            document.getElementById("similarCases");
+
+        if (holder) {
+
+            holder.innerHTML = "";
+
+            (data.similar_cases || []).forEach(c => {
+
+                const el =
+                    document.createElement("div");
+
+                el.className =
+                    "similar-case";
+
+                el.innerHTML =
+                    `<span>#${c.rank}</span>
+                     <strong>Patient ${c.patient_id}</strong>
+                     <b>${Number(c.similarity_percent).toFixed(2)}%</b>`;
+
+                holder.appendChild(el);
+            });
+        }
+
+    } catch (error) {
+
+        console.error(
+            "Advanced Analysis Error:",
+            error
         );
 
+        notice.textContent =
+            "Advanced analysis could not be loaded.";
+
+        notice.classList.add("show");
     }
-
-    finally {
-
-        analyzeButton.disabled =
-            false;
-
-        analyzeButton.innerHTML =
-            "<span>✦</span> Analyze with 3D ResNet";
-
-    }
-
 }
 
+
+// ============================================================
+// EVENTS
+// ============================================================
 
 analyzeButton.addEventListener(
     "click",
@@ -238,201 +426,35 @@ analyzeButton.addEventListener(
 );
 
 
-loadPatients();
-
-
-// ============================================================
-// REAL MRI VIEWER
-// ============================================================
-
-const sliceSlider =
-    document.getElementById("sliceSlider");
-
-let mriRequestNumber = 0;
-let sliderTimer = null;
-
-
-async function loadMRISlice() {
-
-    const patientId = patientSelect.value;
-
-    if (!patientId) return;
-
-    // Representative BraTS-PED MRI images
-    document.getElementById("mriT1N").src = "/static/t1n.png";
-    document.getElementById("mriT1C").src = "/static/t1c.png";
-    document.getElementById("mriT2W").src = "/static/t2w.png";
-    document.getElementById("mriT2F").src = "/static/t2f.png";
-
-    document.getElementById(
-        "sliceCounter"
-    ).textContent = "Representative MRI";
-}
-
-// ------------------------------------------------------------
-// SLIDER
-// ------------------------------------------------------------
-
-sliceSlider.addEventListener(
-    "input",
-    () => {
-
-        document.getElementById(
-            "sliceCounter"
-        ).textContent =
-            `Slice ${Number(sliceSlider.value) + 1} / 64`;
-
-        clearTimeout(sliderTimer);
-
-        sliderTimer =
-            setTimeout(
-                loadMRISlice,
-                70
-            );
-    }
-);
-
-
-// ------------------------------------------------------------
-// PATIENT CHANGE
-// ------------------------------------------------------------
-
 patientSelect.addEventListener(
     "change",
     () => {
 
-        // Start each patient around middle slice
-        sliceSlider.value = 32;
+        if (sliceSlider) {
+            sliceSlider.value = 32;
+        }
 
         loadMRISlice();
+
+        loadAdvancedAnalysis(
+            patientSelect.value
+        );
     }
 );
 
 
-// ------------------------------------------------------------
-// INITIAL LOAD
-// ------------------------------------------------------------
-
-setTimeout(
-    loadMRISlice,
-    800
-);
-
 // ============================================================
-// ADVANCED AI ANALYSIS
+// START WEBSITE
 // ============================================================
-function fmt(v, digits=2) {
-    if (v === null || v === undefined || Number.isNaN(Number(v))) return "—";
-    return Number(v).toFixed(digits);
-}
 
-async function loadAdvancedAnalysis(patientId) {
-    const notice = document.getElementById("advancedNotice");
-    if (!notice) return;
-    try {
-        const response = await fetch(`/api/advanced/${patientId}`);
-        const data = await response.json();
-        if (!data.available) {
-            notice.textContent = data.message || "Advanced analysis unavailable for this patient.";
-            notice.classList.add("show");
-            return;
-        }
-        notice.textContent = "Advanced research modules loaded for representative Patient 172.";
-        notice.classList.remove("show");
-const q = data.quantification || {};
-const mc = data.mc_dropout || {};
-const oc = data.occlusion || {};
-const mx = data.multi_xai || {};
+async function initializeWebsite() {
 
-document.getElementById("advTumorVoxels").textContent =
-    q.tumor_voxels !== undefined ? Number(q.tumor_voxels).toLocaleString() : "—";
+    await loadPatients();
 
-document.getElementById("advTumorSlices").textContent =
-    q.tumor_slices ?? "—";
-
-document.getElementById("advMaxSlice").textContent =
-    q.max_tumor_slice ?? "—";
-
-document.getElementById("advBurden").textContent =
-    q.relative_burden_percent !== undefined
-        ? `${fmt(q.relative_burden_percent, 4)}%`
-        : "—";
-
-document.getElementById("advMCPasses").textContent =
-    mc.mc_passes ?? "—";
-
-document.getElementById("advMCMean").textContent =
-    mc.mean_confidence_percent !== undefined
-        ? `${fmt(mc.mean_confidence_percent, 2)}%`
-        : "—";
-
-document.getElementById("advEntropy").textContent =
-    fmt(mc.entropy, 3);
-
-document.getElementById("advVariation").textContent =
-    fmt(mc.variation_ratio, 4);
-
-document.getElementById("advStability").textContent =
-    mc.stability || "—";
-
-document.getElementById("advOccDrop").textContent =
-    oc.max_confidence_drop !== undefined
-        ? `${fmt(oc.max_confidence_drop * 100, 2)} pp`
-        : "—";
-
-document.getElementById("advOccSlice").textContent =
-    oc.influential_slice ?? "—";
-
-document.getElementById("advGradAtt").textContent =
-    mx.gradcam_tumor_attention_percent !== undefined
-        ? `${fmt(mx.gradcam_tumor_attention_percent, 2)}%`
-        : "—";
-
-document.getElementById("advOccAtt").textContent =
-    mx.occlusion_tumor_attention_percent !== undefined
-        ? `${fmt(mx.occlusion_tumor_attention_percent, 2)}%`
-        : "—";
-
-document.getElementById("advOccIou").textContent =
-    fmt(mx.occlusion_tumor_iou, 4);
-
-document.getElementById("advCorr").textContent =
-    fmt(mx.xai_correlation, 3);
-        const holder=document.getElementById("similarCases"); holder.innerHTML="";
-        (data.similar_cases||[]).forEach(c=>{
-            const el=document.createElement("div"); el.className="similar-case";
-            el.innerHTML=`<span>#${c.rank}</span><strong>Patient ${c.patient_id}</strong><b>${c.similarity_percent.toFixed(2)}%</b><small>${c.burden_category} • burden ${c.tumor_burden_percent.toFixed(4)}%</small>`;
-            holder.appendChild(el);
-        });
-    } catch(e) {
-        notice.textContent = "Advanced analysis could not be loaded. Ensure the advanced result files exist in final_project_results.";
-        notice.classList.add("show");
-        console.error(e);
+    if (patientSelect.value === "172") {
+        loadMRISlice();
+        loadAdvancedAnalysis(172);
     }
 }
 
-// Load advanced research output after the main real-model analysis completes.
-analyzeButton.addEventListener("click", () => {
-    const pid = patientSelect.value;
-    setTimeout(() => loadAdvancedAnalysis(pid), 250);
-});
-
-patientSelect.addEventListener("change", () => loadAdvancedAnalysis(patientSelect.value));
-setTimeout(() => loadAdvancedAnalysis(patientSelect.value || 172), 1200);
-// ===== FINAL DEMO IMAGE FIX =====
-window.addEventListener("load", () => {
-    const staticImages = {
-        mriT1N: "/static/t1n.png",
-        mriT1C: "/static/t1c.png",
-        mriT2W: "/static/t2w.png",
-        mriT2F: "/static/t2f.png"
-    };
-
-    Object.entries(staticImages).forEach(([id, src]) => {
-        const img = document.getElementById(id);
-        if (img) {
-            img.src = src;
-            img.style.display = "block";
-        }
-    });
-
+initializeWebsite();
