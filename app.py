@@ -1036,37 +1036,61 @@ def advanced_analysis(patient_id):
             "message": "Patient not found"
         }), 404
 
+
     return jsonify({
         "patient_id": patient_id,
         "available": True,
+
         "quantification": {
             "tumor_voxels": patient["tumor_voxels"],
             "tumor_slices": patient["tumor_containing_slices"],
             "max_tumor_slice": patient["max_tumor_slice"],
-            "relative_burden_percent": patient["relative_tumor_burden_percent"]
+            "relative_burden_percent":
+                patient["relative_tumor_burden_percent"]
         },
+
         "mc_dropout": {
             "mc_passes": patient["mc_passes"],
-            "mean_confidence_percent": patient["predicted_confidence_mean"] * 100,
+            "mean_confidence_percent":
+                patient["predicted_confidence_mean"] * 100,
             "entropy": patient["predictive_entropy"],
             "variation_ratio": patient["variation_ratio"],
             "stability": patient["stability"]
         },
+
+        "occlusion": patient.get("occlusion"),
+
         "multi_xai": {
             "gradcam_tumor_attention_percent":
                 patient["gradcam_attention_inside_tumor_percent"],
-            "gradcam_tumor_iou": patient["gradcam_tumor_iou"],
-            "pointing_game": patient["gradcam_pointing_game"]
+            "gradcam_tumor_iou":
+                patient["gradcam_tumor_iou"],
+            "pointing_game":
+                patient["gradcam_pointing_game"],
+
+            "occlusion_tumor_attention_percent":
+                patient.get("multi_xai", {}).get(
+                    "occlusion_tumor_attention_percent"
+                ),
+
+            "occlusion_tumor_iou":
+                patient.get("multi_xai", {}).get(
+                    "occlusion_tumor_iou"
+                ),
+
+            "xai_correlation":
+                patient.get("multi_xai", {}).get(
+                    "xai_correlation"
+                )
         },
-        "occlusion": {
-    "max_confidence_drop": 0.118,
-    "influential_slice": 20
-},
+
         "similar_cases": [],
+
         "notes": {
             "xai": "Research-only model explanation; not a clinical diagnosis."
         }
     })
+
 
 @app.route('/api/advanced-image/<kind>')
 def advanced_image(kind):
