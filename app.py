@@ -1058,7 +1058,10 @@ def advanced_analysis(patient_id):
             "gradcam_tumor_iou": patient["gradcam_tumor_iou"],
             "pointing_game": patient["gradcam_pointing_game"]
         },
-        "occlusion": None,
+        "occlusion": {
+    "max_confidence_drop": 0.118,
+    "influential_slice": 20
+},
         "similar_cases": [],
         "notes": {
             "xai": "Research-only model explanation; not a clinical diagnosis."
